@@ -114,3 +114,6 @@ if Vagrant.has_plugin?("vagrant-timezone")
 ```bash
 vagrant plugin install vagrant-timezone
 ```
+
+Установка всех необходимых плагинов произойдёт автоматически при первом запуске развертывания, если они не были ранее установлены.
+
