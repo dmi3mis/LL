@@ -1,0 +1,192 @@
+#!/bin/sh
+
+systemctl enable firewalld
+systemctl start firewalld
+
+firewall-cmd --add-masquerade --permanent; firewall-cmd --reload
+
+grep -q CentOS /etc/redhat-release && RPMKEY="https://www.centos.org/keys/RPM-GPG-KEY-CentOS-7" \
+                                   || RPMKEY="https://www.redhat.com/security/fd431d51.txt"
+
+cat <<EOF >/etc/yum.repos.d/installmedia-dvd-local.repo
+[installmedia-dvd]
+name = Red Hat Local DVD Repository
+baseurl =file:///var/ftp/pub/dvd
+enabled = 1
+gpgkey = $RPMKEY
+gpgcheck = 1
+cost = 50
+EOF
+
+echo -e "Configuring FTP server with dvd: \n"
+#############################################
+mkdir -p /var/ftp/pub/dvd
+mount /dev/cdrom /var/ftp/pub/dvd
+
+yum -y install vsftpd
+setsebool ftpd_full_access on &
+systemctl enable vsftpd
+systemctl start vsftpd
+
+# Lets disable SELINUX
+sed -i --follow-symlinks 's/^SELINUX=.*/SELINUX=disabled/g' /etc/sysconfig/selinux && cat /etc/sysconfig/selinux
+
+
+yum -y install syslinux xinetd tftp-server vsftpd bash-completion bash-completion-extra
+
+
+echo -e "Configuring dhcp server: /n"
+yum -y install dhcp
+cat <<EOF >/etc/dhcp/dhcpd.conf
+ddns-update-style none;
+option space PXE;
+subnet 192.168.2.0 netmask 255.255.255.0 {
+
+class "PXE" {
+	match if substring(option vendor-class-identifier, 0, 9) = "PXEClient";
+		option vendor-encapsulated-options 01:04:00:00:00:00:ff;
+			option boot-size 0x1;
+			filename "pxelinux.0";
+			option tftp-server-name "192.168.2.254";
+			option vendor-class-identifier "PXEClient";
+			vendor-option-space PXE;
+}
+
+    option routers 192.168.2.254;
+	option subnet-mask 255.255.255.0;
+	option domain-name "ll-100.local"; 
+	option domain-name-servers 192.168.2.254;
+	default-lease-time 21600;
+	max-lease-time 43200;
+	pool {
+	    allow members of "PXE";
+	    default-lease-time 120;
+	    max-lease-time 180;
+	    range 192.168.2.200 192.168.2.250;
+	}
+	pool {
+		range 192.168.2.50 192.168.2.199;
+	}
+	next-server 192.168.2.254;
+}
+EOF
+
+systemctl enable dhcpd
+systemctl start dhcpd
+
+echo -e "Configuring pxe server: /n"
+yum -y install syslinux xinetd tftp-server 
+mkdir /var/lib/tftpboot/pxelinux.cfg
+cp /usr/share/syslinux/pxelinux.0 /var/lib/tftpboot/ 
+
+sed -i -e 's/.*disable.*= yes/        disable                 = no/g' /etc/xinetd.d/tftp
+systemctl enable xinetd
+systemctl start xinetd
+
+
+mkdir /var/ftp/pub/dvd
+mount /dev/cdrom /var/ftp/pub/dvd
+echo "/dev/cdrom /var/ftp/pub/dvd iso9660 defaults 0 0" >> /etc/fstab
+
+setsebool -P ftpd_full_access on
+
+cp /var/ftp/pub/dvd/images/pxeboot/vmlinuz /var/lib/tftpboot/ 
+cp /var/ftp/pub/dvd/images/pxeboot/initrd.img /var/lib/tftpboot/
+cp /usr/share/syslinux/menu.c32 /var/lib/tftpboot/ 
+
+cat <<EOF >/var/lib/tftpboot/pxelinux.cfg/default
+timeout 100
+default menu.c32
+
+menu title ########## PXE Boot Menu ##########
+label 1
+   menu label ^1) Install CentOS 7
+   kernel vmlinuz
+   append initrd=initrd.img method=ftp://192.168.2.254/pub/dvd devfs=nomount
+
+label 2
+   menu label ^2) Boot from local drive
+   localboot
+EOF
+
+for i in http https ftp dns dhcp tftp; do
+    firewall-cmd --permanent --add-service $i;
+done
+firewall-cmd --reload
+
+echo -e "Configuring IPA & DNS server: /n"
+yum install -y bind bind-utils
+
+
+yum install -y ipa-server ipa-server-dns
+
+yum install -y rng-tools
+rngd -r /dev/urandom
+
+sed -i /.*c7-nat01.*/d /etc/hosts
+echo "192.168.2.254 c7-nat01.ll-100.local c7-nat01" >> /etc/hosts
+
+nmcli connection modify 'System eth0' ipv4.ignore-auto-dns yes && nmcli con up 'System eth0'
+
+
+ipa-server-install \
+    --domain=ll-100.local \
+    --realm=LL-100.LOCAL \
+    --ds-password=password \
+    --admin-password=password \
+    --hostname=c7-nat01.ll-100.local \
+    --ip-address=192.168.2.254 \
+    --reverse-zone=2.168.192.in-addr.arpa. \
+    --forwarder=8.8.8.8 \
+    --allow-zone-overlap \
+	--ssh-trust-dns \
+	--allow-zone-overlap \
+    --setup-dns \
+    --unattended
+
+
+#    c7-nat01: Next steps:
+#    c7-nat01:   1. You must make sure these network ports are open:
+#    c7-nat01:           TCP Ports:
+#    c7-nat01:             * 80, 443: HTTP/HTTPS
+#    c7-nat01:             * 389, 636: LDAP/LDAPS
+#    c7-nat01:             * 88, 464: kerberos
+#    c7-nat01:             * 53: bind
+#    c7-nat01:           UDP Ports:
+#    c7-nat01:             * 88, 464: kerberos
+#    c7-nat01:             * 53: bind
+#    c7-nat01:             * 123: ntp
+
+
+for i in http https ldap ldaps kerberos kadmin kpasswd dns ntp; do
+    firewall-cmd --permanent --add-service $i;
+done
+firewall-cmd --reload
+
+yum install -y vsftpd
+systemctl enable vsftpd
+systemctl start vsftpd
+
+firewall-cmd --add-service ftp --permanent; firewall-cmd --reload
+
+cp /root/cacert.p12 /var/ftp/pub
+
+echo -n 'password' | kinit admin
+ipa user-add lisa --first=lisa --last=jones
+echo 'password' | ipa passwd lisa
+ipa user-add linda --first=linda --last=thomsen
+echo 'password' | ipa passwd linda
+
+ipa host-add c7-server01.ll-100.local --ip-address=192.168.2.10
+ipa host-add c7-server02.ll-100.local --ip-address=192.168.2.20
+ipa host-add c6-server01.ll-100.local --ip-address=192.168.2.30
+ipa host-add c7-client01.ll-100.local --ip-address=192.168.2.40
+ipa host-add c7-client02.ll-100.local --ip-address=192.168.2.50
+
+
+ipa service-add nfs/c7-server01.ll-100.local
+ipa service-add cifs/c7-server01.ll-100.local
+ipa-getkeytab -s c7-nat01.ll-100.local -p  nfs/c7-server01.ll-100.local -k /var/ftp/pub/c7-server01-cifs.keytab
+ipa-getkeytab -s c7-nat01.ll-100.local -p cifs/c7-server01.ll-100.local -k /var/ftp/pub/c7-server01-nfs.keytab
+
+chmod +r /var/ftp/pub/*.keytab

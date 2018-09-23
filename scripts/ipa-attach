@@ -1,0 +1,17 @@
+#!/bin/sh
+
+yum install -y ipa-client chrony ntpd bash-completion bash-completion-extra
+systemctl disable chronyd
+systemctl stop chronyd
+
+systemctl enable ntpd 
+systemctl start ntpd
+
+
+while ! (echo > /dev/tcp/192.168.2.254/389) >/dev/null 2>&1; do
+    echo "ipa server not ready yet - waiting for 10s"
+    sleep 10
+done
+nmcli connection modify 'System eth0' ipv4.ignore-auto-dns yes && nmcli con up 'System eth0'
+
+ipa-client-install --mkhomedir --enable-dns-updates --force-ntpd -p admin@LL-100.LOCAL --password='password' --force-join -U
