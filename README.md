@@ -103,7 +103,31 @@ vagrant snapshot save [vm-name] snapshot-name
 
 ### Полезные плагины
 
-При первом запуске `vagrant up` попросит установить необходимые плагины vagrant-vbguest vagrant-timezone vagrant-hosts если не было установлено. Ответьте на вопросы, нажав кнопку "y" и после установки плагинов повторите вашу команду.
+При первом запуске `vagrant up` попросит установить необходимые плагины vagrant-vbguest vagrant-timezone vagrant-hosts если не было установлено. Ответьте на вопросы, нажав кнопку "y" и после установки плагинов повторите вашу команду. 
+Во время установки необходимых плагинов вы увидите примерно такой текст:
+
+```bash
+ vagrant up
+Vagrant has detected project local plugins configured for this
+project which are not installed.
+
+  vagrant-hosts, vagrant-timezone, vagrant-vbguest
+Install local plugins (Y/N) [N]: y
+Installing the 'vagrant-vbguest' plugin. This can take a few minutes...
+Fetching: micromachine-2.0.0.gem (100%)
+Fetching: vagrant-vbguest-0.16.0.gem (100%)
+Installed the plugin 'vagrant-vbguest (0.16.0)'!
+Installing the 'vagrant-timezone' plugin. This can take a few minutes...
+Fetching: vagrant-timezone-1.2.0.gem (100%)
+Installed the plugin 'vagrant-timezone (1.2.0)'!
+Installing the 'vagrant-hosts' plugin. This can take a few minutes...
+Fetching: vagrant-hosts-2.8.3.gem (100%)
+Installed the plugin 'vagrant-hosts (2.8.3)'!
+
+
+Vagrant has completed installing local plugins for the current Vagrant
+project directory. Please run the requested command again.
+```
 
 Описание плагинов:
 
