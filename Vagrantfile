@@ -19,8 +19,8 @@ Vagrant.configure(2) do |config|
   c7_client02_memory = 2048 # Recommended: 2048 MiB / Minimum: 1024 MiB
   extra_disk_size = 2 # Recommended: 10 GiB / Minimum: 2 GiB
 
-  # VM guest configuration
-  config.vm.box = "centos/7" # Use centos/7 or the label you used when adding the downloaded rhel box, for expl: rhel/7.2
+  # VM vagrant box name
+  config.vm.box = "dmi3mis/centos7"
 
  config.vagrant.plugins = ["vagrant-vbguest", "vagrant-timezone", "vagrant-hosts"]
  config.timezone.value = :host
@@ -180,7 +180,7 @@ Vagrant.configure(2) do |config|
 
 
   config.vm.define :"c7-client01" do |c7_client01_config|
-    c7_client01_config.vm.box = "generic/centos7"
+    c7_client01_config.vm.box = "dmi3mis/centos7_desktop"
     c7_client01_config.vm.hostname = "c7-client01.ll-100.local"
     c7_client01_config.vm.network "private_network", ip: "192.168.2.40", auto_config: false
     c7_client01_config.vm.provision :shell, run: "always", inline: "(nmcli device connect '#{devname}' &) && sleep 10 && nmcli con modify '#{conname}' ipv4.addresses 192.168.2.40/24 ipv4.dns 192.168.2.254 ipv4.gateway 192.168.2.254 ipv4.route-metric 10 ipv4.method manual && nmcli con up '#{conname}'"
@@ -219,7 +219,7 @@ Vagrant.configure(2) do |config|
   end
     
   config.vm.define :"c7-client02" do |c7_client02_config|
-    c7_client02_config.vm.box = "generic/centos7"
+    c7_client02_config.vm.box = "dmi3mis/centos7_desktop"
     c7_client02_config.vm.hostname = "c7-client02.ll-100.local"
     c7_client02_config.vm.network "private_network", ip: "192.168.2.50", auto_config: false
     c7_client02_config.vm.provision :shell, run: "always", inline: "(nmcli device connect '#{devname}' &) && sleep 10 && nmcli con modify '#{conname}' ipv4.addresses 192.168.2.50/24 ipv4.dns 192.168.2.254 ipv4.gateway 192.168.2.254 ipv4.route-metric 10 ipv4.method manual && nmcli con up '#{conname}'"
