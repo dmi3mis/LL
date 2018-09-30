@@ -113,7 +113,7 @@ Vagrant.configure(2) do |config|
 
   
   config.vm.define :"c7-server02" do |c7_server02_config|
-    c7_server02_config.vm.box = "centos/7"
+    c7_server02_config.vm.box = "dmi3mis/centos7"
     c7_server02_config.vm.hostname = "c7-server02.ll-100.local"
     c7_server02_config.vm.network "private_network", ip: "192.168.2.20", auto_config: false
     c7_server02_config.vm.provision :shell, run: "always", inline: "(nmcli device connect '#{devname}' &) && sleep 10 && nmcli con modify '#{conname}' ipv4.addresses 192.168.2.20/24 ipv4.dns 192.168.2.254 ipv4.gateway 192.168.2.254 ipv4.route-metric 10  ipv4.method manual && nmcli con up '#{conname}'"
