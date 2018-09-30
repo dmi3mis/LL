@@ -120,10 +120,15 @@ yum install -y bind bind-utils  bind-dyndb-ldap ipa-server ipa-server-dns
 yum install -y rng-tools
 rngd -r /dev/urandom
 
+<<<<<<< HEAD
 # yum update -y
  
  #nmcli conn modify System\ eth0 ipv4.ignore-auto-dns on
  #nmcli conn up System\ eth0
+=======
+
+yum update -y
+>>>>>>> 033550eac210a314c0703a098898a383fb0c6daf
 
 sed -i /.*c7-nat01.*/d /etc/hosts
 echo "192.168.2.254 c7-nat01.ll-100.local c7-nat01" >> /etc/hosts
