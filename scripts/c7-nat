@@ -123,6 +123,9 @@ yum install -y ipa-server ipa-server-dns
 yum install -y rng-tools
 rngd -r /dev/urandom
 
+
+yum update -y
+
 sed -i /.*c7-nat01.*/d /etc/hosts
 echo "192.168.2.254 c7-nat01.ll-100.local c7-nat01" >> /etc/hosts
 
