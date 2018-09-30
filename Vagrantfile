@@ -66,7 +66,7 @@ Vagrant.configure(2) do |config|
       vbox.auto_nat_dns_proxy = false
       vbox.customize ["modifyvm", :id, "--natdnsproxy1", "off"]
       vbox.customize ["modifyvm", :id, "--natdnshostresolver1", "off"]
-	    vbox.customize ['storageattach', :id, '--storagectl', 'IDE Controller', '--port', "1", '--device', "1", '--type', 'dvddrive', '--medium', vbox_dvd_path ]
+	    vbox.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', "1", '--device', "1", '--type', 'dvddrive', '--medium', vbox_dvd_path ]
 	    vbox.customize ["modifyvm", :id, "--boot1", "disk", "--boot2", "dvd"]
     end
     c7_nat01_config.vm.provider "libvirt" do |libvirt, override|
@@ -101,7 +101,7 @@ Vagrant.configure(2) do |config|
       if !File.exist?(vbox_vm_path + 'c7-server01_disk2.vdi')
         vbox.customize ['createhd', '--filename', vbox_vm_path + 'c7-server01_disk2.vdi', '--variant', 'Fixed', '--size', extra_disk_size * 1024]
       end
-      vbox.customize ['storageattach', :id,  '--storagectl', 'IDE Controller', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', vbox_vm_path + 'c7-server01_disk2.vdi']
+      vbox.customize ['storageattach', :id,  '--storagectl', 'SATA Controller', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', vbox_vm_path + 'c7-server01_disk2.vdi']
     end
 
     c7_server01_config.vm.provider "libvirt" do |libvirt, override|
@@ -136,7 +136,7 @@ Vagrant.configure(2) do |config|
       if !File.exist?(vbox_vm_path + 'c7-server02_disk2.vdi')
         vbox.customize ['createhd', '--filename', vbox_vm_path + 'c7-server02_disk2.vdi', '--variant', 'Fixed', '--size', extra_disk_size * 1024]
       end
-      vbox.customize ['storageattach', :id,  '--storagectl', 'IDE Controller', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', vbox_vm_path + 'c7-server02_disk2.vdi']
+      vbox.customize ['storageattach', :id,  '--storagectl', 'SATA Controller', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', vbox_vm_path + 'c7-server02_disk2.vdi']
     end
     c7_server02_config.vm.provider "libvirt" do |libvirt, override|
       libvirt.cpus   = 1
@@ -169,7 +169,7 @@ Vagrant.configure(2) do |config|
       if !File.exist?(vbox_vm_path + 'c6-server01_disk2.vdi')
         vbox.customize ['createhd', '--filename', vbox_vm_path + 'c6-server01_disk2.vdi', '--variant', 'Fixed', '--size', extra_disk_size * 1024]
       end
-      vbox.customize ['storageattach', :id,  '--storagectl', 'IDE Controller', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', vbox_vm_path + 'c6-server01_disk2.vdi']
+      vbox.customize ['storageattach', :id,  '--storagectl', 'SATA Controller', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', vbox_vm_path + 'c6-server01_disk2.vdi']
     end
     c6_server01_config.vm.provider "libvirt" do |libvirt, override|
       libvirt.cpus   = 1
@@ -209,7 +209,7 @@ Vagrant.configure(2) do |config|
       if !File.exist?(vbox_vm_path + 'c7-client01_disk2.vdi')
         vbox.customize ['createhd', '--filename', vbox_vm_path + 'c7-client01_disk2.vdi', '--variant', 'Fixed', '--size', extra_disk_size * 1024]
       end
-      vbox.customize ['storageattach', :id,  '--storagectl', 'IDE Controller', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', vbox_vm_path + 'c7-client01_disk2.vdi']
+      vbox.customize ['storageattach', :id,  '--storagectl', 'SATA Controller', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', vbox_vm_path + 'c7-client01_disk2.vdi']
     end
     c7_client01_config.vm.provider "libvirt" do |libvirt, override|
       libvirt.cpus   = 1
@@ -248,7 +248,7 @@ Vagrant.configure(2) do |config|
       if !File.exist?(vbox_vm_path + 'c7-client02_disk2.vdi')
         vbox.customize ['createhd', '--filename', vbox_vm_path + 'c7-client02_disk2.vdi', '--variant', 'Fixed', '--size', extra_disk_size * 1024]
       end
-      vbox.customize ['storageattach', :id,  '--storagectl', 'IDE Controller', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', vbox_vm_path + 'c7-client02_disk2.vdi']
+      vbox.customize ['storageattach', :id,  '--storagectl', 'SATA Controller', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', vbox_vm_path + 'c7-client02_disk2.vdi']
     end
     c7_client02_config.vm.provider "libvirt" do |libvirt, override|
       libvirt.cpus   = 1
