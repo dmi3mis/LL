@@ -55,7 +55,7 @@ Vagrant.configure(2) do |config|
       vbox.cpus   = 1
       vbox.memory = c7_nat01_memory
       vbox.name   = "c7-nat01.LL-100.local"
-      vbox.linked_clone = true
+      #vbox.linked_clone = true
       vbox.customize ["modifyvm", :id, "--natdnsproxy1", "off"]
       vbox.customize ["modifyvm", :id, "--natdnshostresolver1", "off"]
       vbox.customize ["modifyvm", :id, "--vram", "32"]
@@ -87,7 +87,7 @@ Vagrant.configure(2) do |config|
       vbox.cpus = 1
       vbox.memory = c7_server01_memory
       vbox.name = "c7-server01.LL-100.local"
-      vbox.linked_clone = true      
+      #vbox.linked_clone = true      
       vbox.customize ["modifyvm", :id, "--natdnsproxy1", "off"]
       vbox.customize ["modifyvm", :id, "--natdnshostresolver1", "off"]
       vbox.customize ["modifyvm", :id, "--vram", "32"]
@@ -101,7 +101,7 @@ Vagrant.configure(2) do |config|
       if !File.exist?(vbox_vm_path + 'c7-server01_disk2.vdi')
         vbox.customize ['createhd', '--filename', vbox_vm_path + 'c7-server01_disk2.vdi', '--variant', 'Fixed', '--size', extra_disk_size * 1024]
       end
-      vbox.customize ['storageattach', :id,  '--storagectl', 'IDE', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', vbox_vm_path + 'c7-server01_disk2.vdi']
+      vbox.customize ['storageattach', :id,  '--storagectl', 'IDE Controller', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', vbox_vm_path + 'c7-server01_disk2.vdi']
     end
 
     c7_server01_config.vm.provider "libvirt" do |libvirt, override|
@@ -122,7 +122,7 @@ Vagrant.configure(2) do |config|
       vbox.cpus = 1
       vbox.memory = c7_server02_memory
       vbox.name = "c7-server02.LL-100.local"
-      vbox.linked_clone = true
+      #vbox.linked_clone = true
       vbox.customize ["modifyvm", :id, "--natdnsproxy1", "off"]
       vbox.customize ["modifyvm", :id, "--natdnshostresolver1", "off"]
       vbox.customize ["modifyvm", :id, "--vram", "32"]
@@ -136,7 +136,7 @@ Vagrant.configure(2) do |config|
       if !File.exist?(vbox_vm_path + 'c7-server02_disk2.vdi')
         vbox.customize ['createhd', '--filename', vbox_vm_path + 'c7-server02_disk2.vdi', '--variant', 'Fixed', '--size', extra_disk_size * 1024]
       end
-      vbox.customize ['storageattach', :id,  '--storagectl', 'IDE', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', vbox_vm_path + 'c7-server02_disk2.vdi']
+      vbox.customize ['storageattach', :id,  '--storagectl', 'IDE Controller', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', vbox_vm_path + 'c7-server02_disk2.vdi']
     end
     c7_server02_config.vm.provider "libvirt" do |libvirt, override|
       libvirt.cpus   = 1
@@ -155,7 +155,7 @@ Vagrant.configure(2) do |config|
       vbox.cpus = 1
       vbox.memory = c6_server01_memory
       vbox.name = "c6-server01.LL-100.local"
-      vbox.linked_clone = true
+      #vbox.linked_clone = true
       vbox.customize ["modifyvm", :id, "--natdnsproxy1", "off"]
       vbox.customize ["modifyvm", :id, "--natdnshostresolver1", "off"]
       vbox.customize ["modifyvm", :id, "--vram", "32"]
@@ -169,7 +169,7 @@ Vagrant.configure(2) do |config|
       if !File.exist?(vbox_vm_path + 'c6-server01_disk2.vdi')
         vbox.customize ['createhd', '--filename', vbox_vm_path + 'c6-server01_disk2.vdi', '--variant', 'Fixed', '--size', extra_disk_size * 1024]
       end
-      vbox.customize ['storageattach', :id,  '--storagectl', 'IDE', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', vbox_vm_path + 'c6-server01_disk2.vdi']
+      vbox.customize ['storageattach', :id,  '--storagectl', 'IDE Controller', '--port', 1, '--device', 0, '--type', 'hdd', '--medium', vbox_vm_path + 'c6-server01_disk2.vdi']
     end
     c6_server01_config.vm.provider "libvirt" do |libvirt, override|
       libvirt.cpus   = 1
@@ -190,7 +190,7 @@ Vagrant.configure(2) do |config|
       vbox.cpus = 1
       vbox.memory = c7_client01_memory
       vbox.name = "c7-client01.LL-100.local"
-      vbox.linked_clone = true
+      #vbox.linked_clone = true
       vbox.customize ["modifyvm", :id, "--natdnsproxy1", "off"]
       vbox.customize ["modifyvm", :id, "--natdnshostresolver1", "off"]
       vbox.customize ["modifyvm", :id, "--vram", "32"]
@@ -229,7 +229,7 @@ Vagrant.configure(2) do |config|
       vbox.cpus = 1
       vbox.memory = c7_client02_memory
       vbox.name = "c7-client02.LL-100.local"
-      vbox.linked_clone = true
+      #vbox.linked_clone = true
       vbox.customize ["modifyvm", :id, "--natdnsproxy1", "off"]
       vbox.customize ["modifyvm", :id, "--natdnshostresolver1", "off"]
       vbox.customize ["modifyvm", :id, "--vram", "32"]

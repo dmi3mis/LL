@@ -115,18 +115,18 @@ done
 firewall-cmd --reload
 
 echo -e "Configuring IPA & DNS server: /n"
-yum install -y bind bind-utils
-
-
-yum install -y ipa-server ipa-server-dns
+yum install -y bind bind-utils  bind-dyndb-ldap ipa-server ipa-server-dns
 
 yum install -y rng-tools
 rngd -r /dev/urandom
 
+# yum update -y
+ 
+ #nmcli conn modify System\ eth0 ipv4.ignore-auto-dns on
+ #nmcli conn up System\ eth0
+
 sed -i /.*c7-nat01.*/d /etc/hosts
 echo "192.168.2.254 c7-nat01.ll-100.local c7-nat01" >> /etc/hosts
-
-nmcli connection modify 'System eth0' ipv4.ignore-auto-dns yes && nmcli con up 'System eth0'
 
 
 ipa-server-install \
@@ -143,6 +143,8 @@ ipa-server-install \
 	--allow-zone-overlap \
     --setup-dns \
     --unattended
+
+nmcli connection modify 'System eth0' ipv4.ignore-auto-dns yes && nmcli con up 'System eth0'
 
 
 #    c7-nat01: Next steps:
