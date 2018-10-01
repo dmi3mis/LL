@@ -66,7 +66,7 @@ Vagrant.configure(2) do |config|
       vbox.auto_nat_dns_proxy = false
       vbox.customize ["modifyvm", :id, "--natdnsproxy1", "off"]
       vbox.customize ["modifyvm", :id, "--natdnshostresolver1", "off"]
-	    vbox.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', "1", '--device', "1", '--type', 'dvddrive', '--medium', vbox_dvd_path ]
+	    vbox.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', "2", '--device', "0", '--type', 'dvddrive', '--medium', vbox_dvd_path ]
 	    vbox.customize ["modifyvm", :id, "--boot1", "disk", "--boot2", "dvd"]
     end
     c7_nat01_config.vm.provider "libvirt" do |libvirt, override|
