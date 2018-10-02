@@ -11,7 +11,7 @@ Vagrant.configure(2) do |config|
   # Storage pool where the extra disks should be stored when using libVirt
 
   # Memory configuration
-  c7_nat01_memory = 1024 # Recommended: 1024 MiB / Minimum: 512 MiB
+  c7_nat01_memory =    1512 # Recommended: 2048 MiB / Minimum: 1512 MiB Achtung! memory must be not less Minimum. or you will got error in ipa install https://www.reddit.com/r/linuxadmin/comments/9jrbsm/freeipa_server_install_error/ 
   c7_server01_memory = 1024 # Recommended: 1024 MiB / Minimum: 512 MiB
   c7_server02_memory = 1024 # Recommended: 1024 MiB / Minimum: 512 MiB
   c6_server01_memory = 1024 # Recommended: 1024 MiB / Minimum: 512 MiB

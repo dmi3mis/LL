@@ -28,8 +28,9 @@ setsebool ftpd_full_access on &
 systemctl enable vsftpd
 systemctl start vsftpd
 
-# Lets disable SELINUX
+# Lets disable SELINUX May be some time later i will not disable SELinux John Walsh. You will need to weed some time...
 sed -i --follow-symlinks 's/^SELINUX=.*/SELINUX=disabled/g' /etc/sysconfig/selinux && cat /etc/sysconfig/selinux
+setenforce 0
 
 
 yum -y install syslinux xinetd tftp-server vsftpd bash-completion bash-completion-extra
