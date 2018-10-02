@@ -48,6 +48,7 @@ Vagrant.configure(2) do |config|
   
   config.vm.define :"c7-nat01" do |c7_nat01_config|
     c7_nat01_config.vm.hostname = "c7-nat01.ll-100.local"
+    c7_nat01_config.vm.box = "dmi3mis/centos7"
     c7_nat01_config.vm.network "private_network", ip: "192.168.2.254", auto_config: false
     c7_nat01_config.vm.provision :shell, run: "always", inline: "(nmcli device connect '#{devname}' &) && sleep 10 && nmcli con modify '#{conname}' ipv4.addresses 192.168.2.254/24 ipv4.dns 192.168.2.254 ipv4.route-metric 10 ipv4.method manual && nmcli con up '#{conname}'"
     c7_nat01_config.vm.provision :shell, path: "scripts/c7-nat"
