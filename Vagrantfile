@@ -5,7 +5,7 @@ Vagrant.configure(2) do |config|
 
   # Path where the extra disks should be stored when using VirtualBox
   vbox_vm_path = "C:\\VMs\\" # VirtualBox ONLY! Please use "\\" as directory name delimiter on WIndows as example "C:\\Virtualbox\\"
-  vbox_dvd_path = vbox_vm_path + 'CentOS-7-x86_64-DVD-1804.iso'  # iso name of Centos 7 Binary DVD. Please download this dvd in advance.
+  vbox_dvd_path = vbox_vm_path + 'CentOS-7-x86_64-DVD-1810.iso'  # iso name of Centos 7 Binary DVD. Please download this dvd in advance.
   # Storage pool where the extra disks should be stored when using libVirt
   libvirt_storage_pool = "/data/storage/" # libVirt ONLY!
   # Storage pool where the extra disks should be stored when using libVirt
@@ -22,8 +22,8 @@ Vagrant.configure(2) do |config|
   # VM vagrant box name
   config.vm.box = "dmi3mis/centos7"
 
- config.vagrant.plugins = ["vagrant-vbguest", "vagrant-timezone", "vagrant-hosts"]
- config.timezone.value = :host
+  config.vagrant.plugins = ["vagrant-vbguest", "vagrant-timezone", "vagrant-hosts"]
+  config.timezone.value = :host
 
   
   # Don't modify beyond here
@@ -50,6 +50,7 @@ Vagrant.configure(2) do |config|
     c7_nat01_config.vm.hostname = "c7-nat01.ll-100.local"
     c7_nat01_config.vm.box = "dmi3mis/centos7"
     c7_nat01_config.vm.network "private_network", ip: "192.168.2.254", auto_config: false
+    c7_nat01_config.vm.network :forwarded_port, guest: 22, host: 6001, id: "ssh"
     c7_nat01_config.vm.provision :shell, run: "always", inline: "(nmcli device connect '#{devname}' &) && sleep 10 && nmcli con modify '#{conname}' ipv4.addresses 192.168.2.254/24 ipv4.dns 192.168.2.254 ipv4.route-metric 10 ipv4.method manual && nmcli con up '#{conname}'"
     c7_nat01_config.vm.provision :shell, path: "scripts/c7-nat"
     c7_nat01_config.vm.provider "virtualbox" do |vbox, override|
@@ -80,6 +81,7 @@ Vagrant.configure(2) do |config|
     c7_server01_config.vm.box = "dmi3mis/centos7"
     c7_server01_config.vm.hostname = "c7-server01.ll-100.local"
     c7_server01_config.vm.network "private_network", ip: "192.168.2.10", auto_config: false
+    c7_server01_config.vm.network :forwarded_port, guest: 22, host: 6010, id: "ssh"
     c7_server01_config.vm.provision :shell, run: "always", inline: "(nmcli device connect '#{devname}' &) && sleep 10 && nmcli con modify '#{conname}' ipv4.addresses 192.168.2.10/24 ipv4.dns 192.168.2.254 ipv4.gateway 192.168.2.254 ipv4.route-metric 10 ipv4.method manual && nmcli con up '#{conname}'"
     c7_server01_config.vm.network "private_network", ip: "192.168.2.11", auto_config: false
     c7_server01_config.vm.provision :shell, path: "scripts/localrepo"
@@ -117,6 +119,7 @@ Vagrant.configure(2) do |config|
     c7_server02_config.vm.box = "dmi3mis/centos7"
     c7_server02_config.vm.hostname = "c7-server02.ll-100.local"
     c7_server02_config.vm.network "private_network", ip: "192.168.2.20", auto_config: false
+    c7_server02_config.vm.network :forwarded_port, guest: 22, host: 6030, id: "ssh"
     c7_server02_config.vm.provision :shell, run: "always", inline: "(nmcli device connect '#{devname}' &) && sleep 10 && nmcli con modify '#{conname}' ipv4.addresses 192.168.2.20/24 ipv4.dns 192.168.2.254 ipv4.gateway 192.168.2.254 ipv4.route-metric 10  ipv4.method manual && nmcli con up '#{conname}'"
     c7_server02_config.vm.provision :shell, path: "scripts/localrepo"
     c7_server02_config.vm.provider "virtualbox" do |vbox, override|
@@ -152,6 +155,7 @@ Vagrant.configure(2) do |config|
     c6_server01_config.vm.box = "dmi3mis/centos6"
     c6_server01_config.vm.hostname = "c6-server01.ll-100.local"
     c6_server01_config.vm.network "private_network",type: "dhcp"
+    c6_server01_config.vm.network :forwarded_port, guest: 22, host: 6040, id: "ssh"
     c6_server01_config.vm.provider "virtualbox" do |vbox, override|
       vbox.cpus = 1
       vbox.memory = c6_server01_memory
@@ -184,6 +188,7 @@ Vagrant.configure(2) do |config|
     c7_client01_config.vm.box = "dmi3mis/centos7_desktop"
     c7_client01_config.vm.hostname = "c7-client01.ll-100.local"
     c7_client01_config.vm.network "private_network", ip: "192.168.2.40", auto_config: false
+    c7_client01_config.vm.network :forwarded_port, guest: 22, host: 6050, id: "ssh"
     c7_client01_config.vm.provision :shell, run: "always", inline: "(nmcli device connect '#{devname}' &) && sleep 10 && nmcli con modify '#{conname}' ipv4.addresses 192.168.2.40/24 ipv4.dns 192.168.2.254 ipv4.gateway 192.168.2.254 ipv4.route-metric 10 ipv4.method manual && nmcli con up '#{conname}'"
     c7_client01_config.vm.provision :shell, path: "scripts/localrepo"
     c7_client01_config.vm.provision :shell, path: "scripts/c7-client"
@@ -202,11 +207,6 @@ Vagrant.configure(2) do |config|
       vbox.auto_nat_dns_proxy = false
       vbox.customize ["modifyvm", :id, "--natdnsproxy1", "off"]
       vbox.customize ["modifyvm", :id, "--natdnshostresolver1", "off"]
-      vbox.customize ["modifyvm", :id, "--vram", "32"]
-      vbox.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
-      vbox.customize ["setextradata", "global", "GUI/SuppressMessages", "all" ]
-      vbox.customize ["modifyvm", :id, "--usb", "on"]
-      vbox.customize ["modifyvm", :id, "--usbehci", "on"]
       if !File.exist?(vbox_vm_path + 'c7-client01_disk2.vdi')
         vbox.customize ['createhd', '--filename', vbox_vm_path + 'c7-client01_disk2.vdi', '--variant', 'Fixed', '--size', extra_disk_size * 1024]
       end
@@ -223,6 +223,7 @@ Vagrant.configure(2) do |config|
     c7_client02_config.vm.box = "dmi3mis/centos7_desktop"
     c7_client02_config.vm.hostname = "c7-client02.ll-100.local"
     c7_client02_config.vm.network "private_network", ip: "192.168.2.50", auto_config: false
+    c7_client02_config.vm.network :forwarded_port, guest: 22, host: 6060, id: "ssh"
     c7_client02_config.vm.provision :shell, run: "always", inline: "(nmcli device connect '#{devname}' &) && sleep 10 && nmcli con modify '#{conname}' ipv4.addresses 192.168.2.50/24 ipv4.dns 192.168.2.254 ipv4.gateway 192.168.2.254 ipv4.route-metric 10 ipv4.method manual && nmcli con up '#{conname}'"
     c7_client02_config.vm.provision :shell, path: "scripts/localrepo"
     c7_client02_config.vm.provision :shell, path: "scripts/c7-client"
@@ -239,11 +240,6 @@ Vagrant.configure(2) do |config|
       vbox.customize ["modifyvm", :id, "--usb", "on"]
       vbox.customize ["modifyvm", :id, "--usbehci", "on"]
       vbox.auto_nat_dns_proxy = false
-      vbox.customize ["modifyvm", :id, "--natdnsproxy1", "off"]
-      vbox.customize ["modifyvm", :id, "--natdnshostresolver1", "off"]
-      vbox.customize ["modifyvm", :id, "--vram", "32"]
-      vbox.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
-      vbox.customize ["setextradata", "global", "GUI/SuppressMessages", "all" ]
       vbox.customize ["modifyvm", :id, "--usb", "on"]
       vbox.customize ["modifyvm", :id, "--usbehci", "on"]
       if !File.exist?(vbox_vm_path + 'c7-client02_disk2.vdi')
