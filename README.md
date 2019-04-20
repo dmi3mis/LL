@@ -41,7 +41,7 @@ linda                | password
 
 ### c6-server01.example.com
 
-* ip: 192.168.2.10
+* ip: 192.168.2.30
 * minimal server
 * Дополнительный пустой жесткий диск на 2 GiB
 
