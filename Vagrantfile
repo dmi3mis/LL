@@ -199,6 +199,7 @@ Vagrant.configure(2) do |config|
       #vbox.linked_clone = true
       vbox.customize ["modifyvm", :id, "--natdnsproxy1", "off"]
       vbox.customize ["modifyvm", :id, "--natdnshostresolver1", "off"]
+      vbox.customize ["modifyvm", :id, "--graphicscontroller", "vmsvga"]
       vbox.customize ["modifyvm", :id, "--vram", "32"]
       vbox.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
       vbox.customize ["setextradata", "global", "GUI/SuppressMessages", "all" ]
@@ -234,6 +235,7 @@ Vagrant.configure(2) do |config|
       #vbox.linked_clone = true
       vbox.customize ["modifyvm", :id, "--natdnsproxy1", "off"]
       vbox.customize ["modifyvm", :id, "--natdnshostresolver1", "off"]
+      vbox.customize ["modifyvm", :id, "--graphicscontroller", "vmsvga"]
       vbox.customize ["modifyvm", :id, "--vram", "32"]
       vbox.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
       vbox.customize ["setextradata", "global", "GUI/SuppressMessages", "all" ]
