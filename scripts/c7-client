@@ -2,7 +2,7 @@
 
 
 
-yum group install -y "Server with GUI"
+#yum group install -y "Server with GUI"
 
 # man fix
 yum reinstall man man-db man-pages -y
