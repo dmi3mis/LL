@@ -4,8 +4,9 @@
 Vagrant.configure(2) do |config|
 
   # Path where the extra disks should be stored when using VirtualBox
+  # you can download iso from https://mirror.yandex.ru/centos/7/isos/x86_64/CentOS-7-x86_64-DVD-1908.iso
   vbox_vm_path = "C:\\VMs\\" # VirtualBox ONLY! Please use "\\" as directory name delimiter on WIndows as example "C:\\Virtualbox\\"
-  vbox_dvd_path = vbox_vm_path + 'CentOS-7-x86_64-DVD-1810.iso'  # iso name of Centos 7 Binary DVD. Please download this dvd in advance.
+  vbox_dvd_path = vbox_vm_path + 'CentOS-7-x86_64-DVD-1908.iso'  # iso name of Centos 7 Binary DVD. Please download this dvd in advance.
   # Storage pool where the extra disks should be stored when using libVirt
   libvirt_storage_pool = "/data/storage/" # libVirt ONLY!
   # Storage pool where the extra disks should be stored when using libVirt
