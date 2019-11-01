@@ -22,7 +22,7 @@ Vagrant.configure(2) do |config|
   # VM vagrant box name
   config.vm.box = "dmi3mis/centos7"
 
-  config.vagrant.plugins = ["vagrant-vbguest", "vagrant-timezone", "vagrant-hosts"]
+  config.vagrant.plugins = ["vagrant-vbguest", "vagrant-timezone"]
   config.timezone.value = :host
 
   
