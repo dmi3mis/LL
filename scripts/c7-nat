@@ -180,7 +180,7 @@ ipa user-add lisa --first=lisa --last=jones
 echo 'password' | ipa passwd lisa
 ipa user-add linda --first=linda --last=thomsen
 echo 'password' | ipa passwd linda
-
+ipa host-add c7-master.lab.dmi3.ml --ip-address=192.168.2.5
 ipa host-add c7-node1.lab.dmi3.ml --ip-address=192.168.2.10
 ipa host-add c7-node2.lab.dmi3.ml --ip-address=192.168.2.20
 ipa host-add c7-workstation.lab.dmi3.ml --ip-address=192.168.2.40
