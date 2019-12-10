@@ -55,7 +55,7 @@ class "PXE" {
 
     option routers 192.168.2.254;
 	option subnet-mask 255.255.255.0;
-	option domain-name "ll-100.local"; 
+	option domain-name "lab.dmi3.ml"; 
 	option domain-name-servers 192.168.2.254;
 	default-lease-time 21600;
 	max-lease-time 43200;
@@ -126,18 +126,19 @@ rngd -r /dev/urandom
  #nmcli conn modify System\ eth0 ipv4.ignore-auto-dns on
  #nmcli conn up System\ eth0
 
-sed -i /.*c7-nat01.*/d /etc/hosts
-echo "192.168.2.254 c7-nat01.ll-100.local c7-nat01" >> /etc/hosts
-
+#sed -i /.*c7-nat01.*/d /etc/hosts
+echo "192.168.2.254 c7-nat.lab.dmi3.ml c7-master" >> /etc/hosts
+echo "192.168.2.5   c7-master.lab.dmi3.ml c7-master" >> /etc/hosts
+echo "192.168.2.10  c7-node1.lab.dmi3.ml c7-node1" >> /etc/hosts
+echo "192.168.2.20  c7-node2.lab.dmi3.ml c7-node2" >> /etc/hosts
+echo "192.168.2.40  c7-workstation.lab.dmi3.ml c7-node2" >> /etc/hosts
 
 ipa-server-install \
-    --domain=ll-100.local \
-    --realm=LL-100.LOCAL \
+    --domain=lab.dmi3.ml \
+    --realm=LAB.DMI3.ML \
     --ds-password=password \
-    --admin-password=password \
-    --hostname=c7-nat01.ll-100.local \
-    --ip-address=192.168.2.254 \
-    --reverse-zone=2.168.192.in-addr.arpa. \
+   --ip-address=192.168.2.254 \
+   --reverse-zone=2.168.192.in-addr.arpa. \
     --forwarder=8.8.8.8 \
     --allow-zone-overlap \
 	--ssh-trust-dns \
@@ -180,16 +181,14 @@ echo 'password' | ipa passwd lisa
 ipa user-add linda --first=linda --last=thomsen
 echo 'password' | ipa passwd linda
 
-ipa host-add c7-server01.ll-100.local --ip-address=192.168.2.10
-ipa host-add c7-server02.ll-100.local --ip-address=192.168.2.20
-ipa host-add c6-server01.ll-100.local --ip-address=192.168.2.30
-ipa host-add c7-client01.ll-100.local --ip-address=192.168.2.40
-ipa host-add c7-client02.ll-100.local --ip-address=192.168.2.50
+ipa host-add c7-node1.lab.dmi3.ml --ip-address=192.168.2.10
+ipa host-add c7-node2.lab.dmi3.ml --ip-address=192.168.2.20
+ipa host-add c7-workstation.lab.dmi3.ml --ip-address=192.168.2.40
 
 
-ipa service-add nfs/c7-server01.ll-100.local
-ipa service-add cifs/c7-server01.ll-100.local
-ipa-getkeytab -s c7-nat01.ll-100.local -p  nfs/c7-server01.ll-100.local -k /var/ftp/pub/c7-server01-cifs.keytab
-ipa-getkeytab -s c7-nat01.ll-100.local -p cifs/c7-server01.ll-100.local -k /var/ftp/pub/c7-server01-nfs.keytab
+ipa service-add  nfs/c7-master.lab.dmi3.ml
+ipa service-add cifs/c7-master.lab.dmi3.ml
+#ipa-getkeytab -s c7-nat01.ll-100.local -p  nfs/c7-master.lab.dmi3.ml -k /var/ftp/pub/c7-master-cifs.keytab
+#ipa-getkeytab -s c7-nat01.ll-100.local -p cifs/c7-master.lab.dmi3.ml -k /var/ftp/pub/c7-master-nfs.keytab
 
 chmod +r /var/ftp/pub/*.keytab

@@ -14,4 +14,4 @@ while ! (echo > /dev/tcp/192.168.2.254/389) >/dev/null 2>&1; do
 done
 nmcli connection modify 'System eth0' ipv4.ignore-auto-dns yes && nmcli con up 'System eth0'
 
-ipa-client-install --mkhomedir --enable-dns-updates --force-ntpd -p admin@LL-100.LOCAL --password='password' --force-join -U
+ipa-client-install --mkhomedir --enable-dns-updates --force-ntpd -p admin@LAB.DMI3.ML --password='password' --force-join -U

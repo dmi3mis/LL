@@ -11,10 +11,10 @@ Vagrant.configure(2) do |config|
   # Storage pool where the extra disks should be stored when using libVirt
 
   # Memory configuration
-  c7_master_memory = 15000 # Recommended: 2048 MiB / Minimum: 1512 MiB Achtung! memory must be not less Minimum. or you will got error in ipa install https://www.reddit.com/r/linuxadmin/comments/9jrbsm/freeipa_server_install_error/ 
+  c7_nat_memory  = 1500 # Recommended: 2048 MiB / Minimum: 1512 MiB Achtung! memory must be not less Minimum. or you will got error in ipa install https://www.reddit.com/r/linuxadmin/comments/9jrbsm/freeipa_server_install_error/ 
+  c7_master_memory = 15000 #Openshift master
   c7_node1_memory = 4000 # Recommended: 1024 MiB / Minimum: 512 MiB
   c7_node2_memory = 4000 # Recommended: 1024 MiB / Minimum: 512 MiB
-
   c7_workstation_memory = 1500 # Recommended: 2048 MiB / Minimum: 1024 MiB
 
   extra_disk_size = 10 # Recommended: 10 GiB / Minimum: 2 GiB
@@ -46,26 +46,41 @@ Vagrant.configure(2) do |config|
   end
   config.vm.provision :shell, path: "scripts/add-users"
   
+  config.vm.define :"c7-nat" do |c7_master_config|
+    c7_nat_config.vm.hostname = "c7-nat.lab.dmi3.ml"
+    c7_nat_config.vm.box = "dmi3mis/centos7"
+    c7_nat_config.vm.network "private_network", ip: "192.168.2.254", auto_config: false
+    c7_nat_config.vm.network :forwarded_port, guest: 22, host: 6001, id: "ssh"
+    c7_nat_config.vm.provision :shell, run: "always", inline: "(nmcli device connect '#{devname}' &) && sleep 10 && nmcli con modify '#{conname}' ipv4.addresses 192.168.2.254/24 ipv4.dns 192.168.2.254 ipv4.route-metric 10 ipv4.method manual && nmcli con up '#{conname}'"
+    c7_nat_config.vm.provision :shell, path: "scripts/c7-nat"
+    c7_nat_config.vm.provider "virtualbox" do |vbox, override|
+      vbox.cpus   = 4
+      vbox.memory = c7_nat_memory
+      vbox.name   = "c7-nat.lab.dmi3.ml"
+      #vbox.linked_clone = true
+      vbox.auto_nat_dns_proxy = false
+      vbox.customize ["modifyvm", :id, "--natdnsproxy1", "off"]
+      vbox.customize ["modifyvm", :id, "--natdnshostresolver1", "off"]
+	    vbox.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', "2", '--device', "0", '--type', 'dvddrive', '--medium', vbox_dvd_path ]
+	    vbox.customize ["modifyvm", :id, "--boot1", "disk", "--boot2", "dvd"]
+    end
+    c7_nat_config.vm.provider "libvirt" do |libvirt, override|
+      libvirt.cpus   = 1
+      libvirt.memory = c7_nat_memory
+    end
+	end
+
   config.vm.define :"c7-master" do |c7_master_config|
-    c7_master_config.vm.hostname = "c7-master.lab.dmi3mis.ml"
+    c7_master_config.vm.hostname = "c7-master.lab.dmi3.ml"
     c7_master_config.vm.box = "dmi3mis/centos7"
-    c7_master_config.vm.network "private_network", ip: "192.168.2.254", auto_config: false
+    c7_master_config.vm.network "private_network", ip: "192.168.2.5", auto_config: false
     c7_master_config.vm.network :forwarded_port, guest: 22, host: 6001, id: "ssh"
-    c7_master_config.vm.provision :shell, run: "always", inline: "(nmcli device connect '#{devname}' &) && sleep 10 && nmcli con modify '#{conname}' ipv4.addresses 192.168.2.254/24 ipv4.dns 192.168.2.254 ipv4.route-metric 10 ipv4.method manual && nmcli con up '#{conname}'"
-    c7_master_config.vm.provision :shell, path: "scripts/c7-nat"
+    c7_master_config.vm.provision :shell, run: "always", inline: "(nmcli device connect '#{devname}' &) && sleep 10 && nmcli con modify '#{conname}' ipv4.addresses 192.168.2.5/24 ipv4.dns 192.168.2.254 ipv4.route-metric 10 ipv4.method manual && nmcli con up '#{conname}'"
     c7_master_config.vm.provider "virtualbox" do |vbox, override|
       vbox.cpus   = 4
       vbox.memory = c7_master_memory
-      vbox.name   = "c7-master.lab.dmi3mis.ml"
+      vbox.name   = "c7-master.lab.dmi3.ml"
       #vbox.linked_clone = true
-      vbox.customize ["modifyvm", :id, "--natdnsproxy1", "off"]
-      vbox.customize ["modifyvm", :id, "--natdnshostresolver1", "off"]
-      vbox.customize ["modifyvm", :id, "--vram", "32"]
-      vbox.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
-      vbox.customize ["setextradata", "global", "GUI/SuppressMessages", "all" ]
-      vbox.customize ["modifyvm", :id, "--usb", "on"]
-      
-      vbox.customize ["modifyvm", :id, "--usbehci", "on"]
       vbox.auto_nat_dns_proxy = false
       vbox.customize ["modifyvm", :id, "--natdnsproxy1", "off"]
       vbox.customize ["modifyvm", :id, "--natdnshostresolver1", "off"]
@@ -76,11 +91,11 @@ Vagrant.configure(2) do |config|
       libvirt.cpus   = 1
       libvirt.memory = c7_master_memory
     end
-	end
-
+  end
+  
   config.vm.define :"c7-node1" do |c7_node1_config|
     c7_node1_config.vm.box = "dmi3mis/centos7"
-    c7_node1_config.vm.hostname = "c7-node1.lab.dmi3mis.ml"
+    c7_node1_config.vm.hostname = "c7-node1.lab.dmi3.ml"
     c7_node1_config.vm.network "private_network", ip: "192.168.2.10", auto_config: false
     c7_node1_config.vm.network :forwarded_port, guest: 22, host: 6010, id: "ssh"
     c7_node1_config.vm.provision :shell, run: "always", inline: "(nmcli device connect '#{devname}' &) && sleep 10 && nmcli con modify '#{conname}' ipv4.addresses 192.168.2.10/24 ipv4.dns 192.168.2.254 ipv4.gateway 192.168.2.254 ipv4.route-metric 10 ipv4.method manual && nmcli con up '#{conname}'"
@@ -90,15 +105,8 @@ Vagrant.configure(2) do |config|
     c7_node1_config.vm.provider "virtualbox" do |vbox, override|
       vbox.cpus = 1
       vbox.memory = c7_node1_memory
-      vbox.name = "c7-node1.lab.dmi3mis.ml"
+      vbox.name = "c7-node1.lab.dmi3.ml"
       #vbox.linked_clone = true      
-      vbox.customize ["modifyvm", :id, "--natdnsproxy1", "off"]
-      vbox.customize ["modifyvm", :id, "--natdnshostresolver1", "off"]
-      vbox.customize ["modifyvm", :id, "--vram", "32"]
-      vbox.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
-      vbox.customize ["setextradata", "global", "GUI/SuppressMessages", "all" ]
-      vbox.customize ["modifyvm", :id, "--usb", "on"]
-      vbox.customize ["modifyvm", :id, "--usbehci", "on"]
       vbox.auto_nat_dns_proxy = false
       vbox.customize ["modifyvm", :id, "--natdnsproxy1", "off"]
       vbox.customize ["modifyvm", :id, "--natdnshostresolver1", "off"]
@@ -118,7 +126,7 @@ Vagrant.configure(2) do |config|
   
   config.vm.define :"c7-node2" do |c7_node2_config|
     c7_node2_config.vm.box = "dmi3mis/centos7"
-    c7_node2_config.vm.hostname = "c7-node2.lab.dmi3mis.ml"
+    c7_node2_config.vm.hostname = "c7-node2.lab.dmi3.ml"
     c7_node2_config.vm.network "private_network", ip: "192.168.2.20", auto_config: false
     c7_node2_config.vm.network :forwarded_port, guest: 22, host: 6030, id: "ssh"
     c7_node2_config.vm.provision :shell, run: "always", inline: "(nmcli device connect '#{devname}' &) && sleep 10 && nmcli con modify '#{conname}' ipv4.addresses 192.168.2.20/24 ipv4.dns 192.168.2.254 ipv4.gateway 192.168.2.254 ipv4.route-metric 10  ipv4.method manual && nmcli con up '#{conname}'"
@@ -126,15 +134,8 @@ Vagrant.configure(2) do |config|
     c7_node2_config.vm.provider "virtualbox" do |vbox, override|
       vbox.cpus = 1
       vbox.memory = c7_node2_memory
-      vbox.name = "c7-node2.lab.dmi3mis.ml"
+      vbox.name = "c7-node2.lab.dmi3.ml"
       #vbox.linked_clone = true
-      vbox.customize ["modifyvm", :id, "--natdnsproxy1", "off"]
-      vbox.customize ["modifyvm", :id, "--natdnshostresolver1", "off"]
-      vbox.customize ["modifyvm", :id, "--vram", "32"]
-      vbox.customize ["modifyvm", :id, "--clipboard", "bidirectional"]
-      vbox.customize ["setextradata", "global", "GUI/SuppressMessages", "all" ]
-      vbox.customize ["modifyvm", :id, "--usb", "on"]
-      vbox.customize ["modifyvm", :id, "--usbehci", "on"]
       vbox.auto_nat_dns_proxy = false
       vbox.customize ["modifyvm", :id, "--natdnsproxy1", "off"]
       vbox.customize ["modifyvm", :id, "--natdnshostresolver1", "off"]
@@ -152,7 +153,7 @@ Vagrant.configure(2) do |config|
 
   config.vm.define :"c7-workstation" do |c7_workstation_config|
     c7_workstation_config.vm.box = "dmi3mis/centos7_desktop"
-    c7_workstation_config.vm.hostname = "c7-workstation.lab.dmi3mis.ml"
+    c7_workstation_config.vm.hostname = "c7-workstation.lab.dmi3.ml"
     c7_workstation_config.vm.network "private_network", ip: "192.168.2.40", auto_config: false
     c7_workstation_config.vm.network :forwarded_port, guest: 22, host: 6050, id: "ssh"
     c7_workstation_config.vm.provision :shell, run: "always", inline: "(nmcli device connect '#{devname}' &) && sleep 10 && nmcli con modify '#{conname}' ipv4.addresses 192.168.2.40/24 ipv4.dns 192.168.2.254 ipv4.gateway 192.168.2.254 ipv4.route-metric 10 ipv4.method manual && nmcli con up '#{conname}'"
@@ -161,7 +162,7 @@ Vagrant.configure(2) do |config|
     c7_workstation_config.vm.provider "virtualbox" do |vbox, override|
       vbox.cpus = 1
       vbox.memory = c7_workstation_memory
-      vbox.name = "c7-workstation.lab.dmi3mis.ml"
+      vbox.name = "c7-workstation.lab.dmi3.ml"
       #vbox.linked_clone = true
       vbox.customize ["modifyvm", :id, "--natdnsproxy1", "off"]
       vbox.customize ["modifyvm", :id, "--natdnshostresolver1", "off"]
